@@ -82,7 +82,6 @@ def to_utf8(obj):
         return list(to_utf8(i) for i in obj)
     elif isinstance(obj, tuple):
         return tuple(to_utf8(i) for i in obj)
-
     return obj
 
 
