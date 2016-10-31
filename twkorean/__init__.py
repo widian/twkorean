@@ -34,6 +34,14 @@ StemmedTextWithTokens = namedtuple("StemmedTextWithTokens", ["text", "tokens"])
 class TwitterKoreanProcessor(object):
     _normalization = True
     _stemming = True
+
+    def _encode(self, t):
+        return jpype.java.lang.String(t) if isinstance(t, unicode_type)\
+                else jpype.java.lang.String(to_unicode(t))
+    def _decode(self, t):
+        return t if isinstance(t, unicode_type) else to_utf8(t)
+
+
     def __init__(self, normalization=True, stemming=True):
         super(TwitterKoreanProcessor, self).__init__()
 
@@ -42,27 +50,17 @@ class TwitterKoreanProcessor(object):
         self._stemming = stemming
 
     def normalize(self, text):
-        encode = lambda t: jpype.java.lang.String(t) if isinstance(text, unicode_type)\
-            else jpype.java.lang.String(to_unicode(t))
-        decode = lambda t: t if isinstance(text, unicode_type) else to_utf8(t)
         normalize = lambda t: self._processor.normalize(t) if self._normalization\
             else t
-        return decode(normalize(encode(text)))
+        return self._decode(normalize(self._encode(text)))
 
     def stemming(self, tokens):
-        encode = lambda t: jpype.java.lang.String(t) if isinstance(text, unicode_type)\
-            else jpype.java.lang.String(to_unicode(t))
-        decode = lambda t: t if isinstance(text, unicode_type) else to_utf8(t)
         stem = lambda t: self._processor.stem(t) if self._stemming\
                 else t
         return stem(tokens)
 
     def tokenize(self, text):
-        encode = lambda t: jpype.java.lang.String(t) if isinstance(text, unicode_type)\
-            else jpype.java.lang.String(to_unicode(t))
-        decode = lambda t: t if isinstance(text, unicode_type) else to_utf8(t)
-
-        tokens = decode(self.stemming(self._processor.tokenize(encode(self.normalize(text)))))
+        tokens = self._decode(self.stemming(self._processor.tokenize(self._encode(self.normalize(text)))))
 
         new_tokens = list()
         while not tokens.isEmpty():
@@ -71,38 +69,31 @@ class TwitterKoreanProcessor(object):
 
         return [
             KoreanToken(
-                text=decode(t.text()), pos=decode(t.pos().toString()), unknown=t.unknown()
+                text=self._decode(t.text()), pos=self._decode(t.pos().toString()), unknown=t.unknown()
             ) for t in new_tokens 
         ]
 
     def tokenize_to_strings(self, text):
-        encode = lambda t: jpype.java.lang.String(t) if isinstance(text, unicode_type)\
-            else jpype.java.lang.String(to_unicode(t))
-        decode = lambda t: t if isinstance(text, unicode_type) else to_utf8(t)
-        
         tokens = self._processor.tokensToJavaStringList(
                     self.stemming(self._processor.tokenize(
-                        encode(self.normalize(text)))))
+                        self._encode(self.normalize(text)))))
         new_tokens = list()
         while not tokens.isEmpty():
             new_tokens.append(tokens.pop())
-        return [decode(t) for t in new_tokens]
+        return [self._decode(t) for t in new_tokens]
 
     def tokenize_with_index(self, text):
-        encode = lambda t: jpype.java.lang.String(t) if isinstance(text, unicode_type)\
-            else jpype.java.lang.String(to_unicode(t))
-        decode = lambda t: t if isinstance(text, unicode_type) else to_utf8(t)
-
         result = []
-        tokens = self._processor.tokenizeWithIndex(encode(text))
+        tokens = self._processor.tokenizeWithIndex(self._encode(text))
         for t in tokens:
-            token = KoreanToken(text=decode(t.token().text()),
-                                pos=decode(t.token().pos().toString()),
+            token = KoreanToken(text=self._decode(t.token().text()),
+                                pos=self._decode(t.token().pos().toString()),
                                 unknown=t.token().unknown())
             segment = KoreanSegment(start=t.start(), length=t.length(), token=token)
             result.append(segment)
 
         return result
+
 
     # def tokenize_with_index_with_stemmer(self, text):
     #     encode = lambda t: jpype.java.lang.String(t) if isinstance(text, unicode_type)\
