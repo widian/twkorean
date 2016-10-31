@@ -22,7 +22,7 @@ _JAVA_LIB_URLS = [
     "https://repo1.maven.org/maven2/org/apache/thrift/libthrift/0.9.2/libthrift-0.9.2.jar",
     "https://repo1.maven.org/maven2/org/yaml/snakeyaml/1.14/snakeyaml-1.14.jar",
     "https://repo1.maven.org/maven2/com/twitter/twitter-text/1.13.0/twitter-text-1.13.0.jar",
-    "https://repo1.maven.org/maven2/com/twitter/penguin/korean-text/4.4/korean-text-4.4.jar",
+    "https://repo1.maven.org/maven2/com/twitter/penguin/korean-text/4.4.4/korean-text-4.4.4.jar",
 ]
 _PATH_TO_LIB = os.path.join(os.path.abspath(os.path.dirname((__file__))), "twkorean/data/lib")
 
