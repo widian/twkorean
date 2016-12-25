@@ -72,3 +72,7 @@ print_tokens(tokens)
 # ]
 tokens = processor.tokenize(text)
 print_tokens(tokens)
+
+# output : 한국어를 처리하는 예시입니닼ㅋㅋㅋㅋㅋ
+print(processor.detokenize(tokens))
+

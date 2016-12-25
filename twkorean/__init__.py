@@ -73,6 +73,16 @@ class TwitterKoreanProcessor(object):
             ) for t in new_tokens 
         ]
 
+    def detokenize(self, tokens):
+        str_list = [ self._decode(t.text) for t in tokens ]
+        tokens_arraylist = jpype.java.util.ArrayList()
+        for text in str_list:
+            tokens_arraylist.add(text)
+
+        
+
+        return self._processor.detokenize(tokens_arraylist)
+
     def tokenize_to_strings(self, text):
         tokens = self._processor.tokensToJavaStringList(
                     self.stemming(self._processor.tokenize(
